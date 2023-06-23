@@ -1,12 +1,16 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11111337&assignment_repo_type=AssignmentRepo)
-Spark WordCount Demo
-Example code for CS6240
+Spark KMeans Clustering
+Final Project for CS6240
 Summer 2023
+
+About the Dataset
+-----------
+
 
 Author
 -----------
-- Joe Sackett (2018)
-- Updated by Nikos Tziavelis (2023)
+- Nidhi Satish Pai
+- Srijha Kalyan
 
 Installation
 ------------
