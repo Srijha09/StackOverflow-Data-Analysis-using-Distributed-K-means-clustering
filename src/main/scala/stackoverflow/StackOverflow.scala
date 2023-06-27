@@ -4,6 +4,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
+import math.Fractional.Implicits.infixFractionalOps
+import math.Integral.Implicits.infixIntegralOps
+import math.Numeric.Implicits.infixNumericOps
 import org.apache.log4j.{Logger, Level}
 
 import annotation.tailrec
@@ -67,14 +70,63 @@ object StackOverflow extends StackOverflow {
     val results = calculateClusterResults(means, vectorizedPostings)
     printResults(results)
 
-    val kValues = Array(10, 20, 30) // Specify the desired values of k here
+    val kValues = Array(10, 20, 30, 35, 40, 45, 50, 55) // Specify the desired values of k here
 
     kValues.foreach { k =>
       val means = runKMeans(sampleVectors(vectorizedPostings, k * languages.length), vectorizedPostings, k, debug = true)
+      val sse = calculateSSE(means, vectorizedPostings)
       val results = calculateClusterResults(means, vectorizedPostings)
+      println(s"\nSum of squared error=$sse:")
       println(s"\nResults for k=$k:")
       printResults(results)
     }
+
+    val sseValues = kValues.map { k =>
+      val means = runKMeans(sampleVectors(vectorizedPostings, k * languages.length), vectorizedPostings)
+      val sse = calculateSSE(means, vectorizedPostings)
+      (k, sse)
+    }
+    // Find the optimal k based on the elbow method
+    val optimalK = findOptimalK(sseValues)
+
+    println(s"Optimal k value: $optimalK")
+
+    // Run K-means with the optimal k
+    val optimalMeans = runKMeans(sampleVectors(vectorizedPostings, optimalK * languages.length), vectorizedPostings, optimalK)
+    val resultsOptimal = calculateClusterResults(optimalMeans, vectorizedPostings)
+    println(s"\nResults for k=$optimalK:")
+    printResults(resultsOptimal)
+
+  }
+
+  def calculateSSE(means: Array[(Int, Int)], vectors: RDD[(Int, Int)]): Double = {
+    vectors
+      .map(v => (findClosest(v, means), v))
+      .map { case (closest, v) =>
+        calculateEuclideanDistance(v, closest)
+      }
+      .sum()
+  }
+
+  def findOptimalK(sseValues: Array[(Int, Double)]): Int = {
+    val sseDifferences = sseValues.sliding(2).map { case Array(a, b) =>
+      val (_, sseA) = a
+      val (k, sseB) = b
+      (k, sseB - sseA)
+    }.toArray
+
+    val maxSSEDifferenceIndex = sseDifferences.indexWhere { case (_, diff) =>
+      diff < sseDifferences.maxBy(_._2)._2 * 0.1
+    }
+
+    val optimalK = if (maxSSEDifferenceIndex != -1) {
+      val (k, _) = sseDifferences(maxSSEDifferenceIndex)
+      k
+    } else {
+      val (k, _) = sseValues.maxBy { case (_, sse) => sse }
+      k
+    }
+    optimalK
   }
 }
 
