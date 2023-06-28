@@ -1,11 +1,6 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11111337&assignment_repo_type=AssignmentRepo)
-Spark KMeans Clustering
-Final Project for CS6240
-Summer 2023
-
-About the Dataset
------------
-
+StackOverflow Data Analysis using Distributed K means clustering 
+--------------------------
+Final Project for CS6240 Summer 2023
 
 Author
 -----------
@@ -67,3 +62,25 @@ All of the build & execution commands are organized in the Makefile.
 	- `make upload-input-aws`		-- only before first execution
 	- `make aws`					-- check for successful execution with web interface (aws.amazon.com)
 	- `download-output-aws`		-- after successful execution & termination
+
+Project Objective
+-----------
+The goal of this project is to develop a data analysis solution that applies the k-means clustering algorithm to a dataset of Stack Overflow posts. The purpose is to group the posts based on their programming language, allowing for easier analysis and insights into programming trends.
+The project utilizes Apache Spark, a distributed computing framework, to handle large-scale data processing. The Spark RDD (Resilient Distributed Dataset) abstraction is leveraged to perform transformations and computations on the dataset in a distributed and parallel manner. The resulting clusters provide insights into programming language trends and preferences within the Stack Overflow community.
+The project successfully implements k-means clustering using Spark RDDs, showcasing its ability to handle extensive datasets. The analysis includes data loading and parsing, grouping of questions and answers, scoring, vectorization, and the clustering process. The output includes clusters with dominant programming languages, the percentage of questions in each language, cluster sizes, and median scores. The project demonstrates effective data processing and provides valuable insights for understanding programming trends in the Stack Overflow community.
+
+
+About the Dataset
+-----------
+This is a simplified version of a StackOverflow dataset. Each row represents a StackOverflow post and is formatted as follows:
+•	postTypeId: It represents the type of the post. 1 for questions and 2 for answers.
+•	id: This is the unique ID of the post.
+•	acceptedAnswer: (For question posts only) The ID of the accepted answer for a particular question.
+•	parentId: (For answer posts only) The ID of the question that this answer post is associated with.
+•	score: This represents the score of the post (the difference between upvotes and downvotes).
+•	tags: (For question posts only) This is a string representing the tags associated with the question.
+
+Each line in the provided text file has the following format: 
+<postTypeId>,<id>,[<acceptedAnswer>],[<parentId>],<score>,[<tag>]
+
+
