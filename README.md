@@ -1,11 +1,6 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11111337&assignment_repo_type=AssignmentRepo)
-Spark KMeans Clustering
-Final Project for CS6240
-Summer 2023
-
-About the Dataset
------------
-
+StackOverflow Data Analysis using Distributed K means clustering 
+--------------------------
+Final Project for CS6240 Summer 2023
 
 Author
 -----------
@@ -22,8 +17,9 @@ These components are installed:
 
 - Scala 2.12.17 (you can install this specific version with the Coursier CLI tool which also needs to be installed)
 - Spark 3.3.2 (without bundled Hadoop)
+- Scala Build Tool sbt
 
-After downloading the hadoop and spark installations, move them to an appropriate directory:
+After downloading the spark installations, move them to an appropriate directory:
 
 `mv hadoop-3.3.5 /usr/local/hadoop-3.3.5`
 
@@ -67,3 +63,60 @@ All of the build & execution commands are organized in the Makefile.
 	- `make upload-input-aws`		-- only before first execution
 	- `make aws`					-- check for successful execution with web interface (aws.amazon.com)
 	- `download-output-aws`		-- after successful execution & termination
+
+How to run the code
+-----------
+for installing sbt visit [sbt reference manual](https://www.scala-sbt.org/1.x/docs/Setup.html)
+
+At the root of the project run `sbt`
+
+```bash
+sbt run
+```
+
+Project Objective
+-----------
+The goal of this project is to develop a data analysis solution that applies the k-means clustering algorithm to a dataset of Stack Overflow posts. The purpose is to group the posts based on their programming language, allowing for easier analysis and insights into programming trends.
+The project utilizes Apache Spark, a distributed computing framework, to handle large-scale data processing. The Spark RDD (Resilient Distributed Dataset) abstraction is leveraged to perform transformations and computations on the dataset in a distributed and parallel manner. The resulting clusters provide insights into programming language trends and preferences within the Stack Overflow community.
+The project successfully implements k-means clustering using Spark RDDs, showcasing its ability to handle extensive datasets. The analysis includes data loading and parsing, grouping of questions and answers, scoring, vectorization, and the clustering process. The output includes clusters with dominant programming languages, the percentage of questions in each language, cluster sizes, and median scores. The project demonstrates effective data processing and provides valuable insights for understanding programming trends in the Stack Overflow community.
+
+
+About the Dataset
+-----------
+This is a simplified version of a StackOverflow dataset. Each row represents a StackOverflow post and is formatted as follows:
+<item>
+•	postTypeId: It represents the type of the post. 1 for questions and 2 for answers.
+•	id: This is the unique ID of the post.
+•	acceptedAnswer: (For question posts only) The ID of the accepted answer for a particular question.
+•	parentId: (For answer posts only) The ID of the question that this answer post is associated with.
+•	score: This represents the score of the post (the difference between upvotes and downvotes).
+•	tags: (For question posts only) This is a string representing the tags associated with the question.
+</item>
+
+Each line in the provided text file has the following format: 
+<postTypeId>,<id>,[<acceptedAnswer>],[<parentId>],<score>,[<tag>]
+
+Results
+-------
+
+1. Parallelize the computation for each K, running this algorithm for a single K-value at a time
+   Results: K = 45
+   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/9fb7ab77-ca8d-4f4f-8d4e-c2927d44ef9b)
+
+
+   
+3. Running the algorithm for many K-values in parallel, but executing each complete clustering for a single K-value “sequentially.” 
+   We ran the code for multiple k values (25 to 60). Following are the results for some k values:
+
+   | K = 40 | K = 45 |
+   |---|---|
+   | ![K=40](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/983bd831-f581-4089-a531-2eeb6de27725) | ![K=45](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/9f0190c1-bca0-4907-a036-c80e7685e1e9) |
+
+   | K = 50 | K = 55 |
+   |---|---|
+   | ![K=50](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/13530016-d2aa-4441-9b66-c636d3cd5400) | ![K=55](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/3bd716c3-7983-4c31-9d4f-7eec11201e67) |
+   
+
+
+
+
