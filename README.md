@@ -17,8 +17,9 @@ These components are installed:
 
 - Scala 2.12.17 (you can install this specific version with the Coursier CLI tool which also needs to be installed)
 - Spark 3.3.2 (without bundled Hadoop)
+- Scala Build Tool sbt
 
-After downloading the hadoop and spark installations, move them to an appropriate directory:
+After downloading the spark installations, move them to an appropriate directory:
 
 `mv hadoop-3.3.5 /usr/local/hadoop-3.3.5`
 
@@ -63,6 +64,16 @@ All of the build & execution commands are organized in the Makefile.
 	- `make aws`					-- check for successful execution with web interface (aws.amazon.com)
 	- `download-output-aws`		-- after successful execution & termination
 
+How to run the code
+-----------
+for installing sbt visit [sbt reference manual](https://www.scala-sbt.org/1.x/docs/Setup.html)
+
+At the root of the project run `sbt`
+
+```bash
+sbt run
+```
+
 Project Objective
 -----------
 The goal of this project is to develop a data analysis solution that applies the k-means clustering algorithm to a dataset of Stack Overflow posts. The purpose is to group the posts based on their programming language, allowing for easier analysis and insights into programming trends.
@@ -73,14 +84,26 @@ The project successfully implements k-means clustering using Spark RDDs, showcas
 About the Dataset
 -----------
 This is a simplified version of a StackOverflow dataset. Each row represents a StackOverflow post and is formatted as follows:
+<item>
 •	postTypeId: It represents the type of the post. 1 for questions and 2 for answers.
 •	id: This is the unique ID of the post.
 •	acceptedAnswer: (For question posts only) The ID of the accepted answer for a particular question.
 •	parentId: (For answer posts only) The ID of the question that this answer post is associated with.
 •	score: This represents the score of the post (the difference between upvotes and downvotes).
 •	tags: (For question posts only) This is a string representing the tags associated with the question.
+</item>
 
 Each line in the provided text file has the following format: 
 <postTypeId>,<id>,[<acceptedAnswer>],[<parentId>],<score>,[<tag>]
+
+Results
+-------
+
+1. Parallelize the computation for each K, running this algorithm for a single K-value at a time
+   Results: k = 45
+   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/30570368-3b94-4ba1-bd22-363bd0713662)
+
+   
+3. Running the algorithm for many K-values in parallel, but executing each complete clustering for a single K-value “sequentially.” 
 
 
