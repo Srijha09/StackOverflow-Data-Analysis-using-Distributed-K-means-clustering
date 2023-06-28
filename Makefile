@@ -4,24 +4,24 @@
 # -----------------------------------------------------------
 spark.root=/usr/local/spark-3.4.0-bin-without-hadoop
 hadoop.root=/usr/local/hadoop-3.3.5
-app.name=Word Count
+app.name=Stack Overflow
 jar.name=spark-demo.jar
 maven.jar.name=spark-demo-1.0.jar
-job.name=stackoverflow.StackOverflow
+job.name=stack.StackOverflowKMeansApp
 local.master=local[4]
 local.input=input
 local.output=output
 # Pseudo-Cluster Execution
-hdfs.user.name=Srijha_Kalyan
+hdfs.user.name=Nidhi
 hdfs.input=input
 hdfs.output=output
 # AWS EMR Execution
 aws.emr.release=emr-6.10.0
-aws.bucket.name=skalyan4
+aws.bucket.name=kmeansproject
 aws.input=input
 aws.output=output
 aws.log.dir=log
-aws.num.nodes=5
+aws.num.nodes=8
 aws.instance.type=m3.xlarge
 # -----------------------------------------------------------
 
@@ -110,7 +110,7 @@ upload-app-aws:
 # Main EMR launch.
 aws: jar upload-app-aws delete-output-aws
 	aws emr create-cluster \
-		--name "WordCount Spark Cluster" \
+		--name "Stack Overflow Spark Cluster" \
 		--release-label ${aws.emr.release} \
 		--instance-groups '[{"InstanceCount":${aws.num.nodes},"InstanceGroupType":"CORE","InstanceType":"${aws.instance.type}"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"${aws.instance.type}"}]' \
 		--applications Name=Hadoop Name=Spark \
