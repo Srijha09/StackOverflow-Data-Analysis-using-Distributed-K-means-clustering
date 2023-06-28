@@ -101,7 +101,8 @@ Results
 
 1. Parallelize the computation for each K, running this algorithm for a single K-value at a time
    Results: k = 45
-   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/30570368-3b94-4ba1-bd22-363bd0713662)
+   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/9fb7ab77-ca8d-4f4f-8d4e-c2927d44ef9b)
+
 
    
 3. Running the algorithm for many K-values in parallel, but executing each complete clustering for a single K-value “sequentially.” 
