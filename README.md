@@ -112,22 +112,10 @@ Results
    |---|---|
    | ![K=40](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/983bd831-f581-4089-a531-2eeb6de27725) | ![K=45](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/9f0190c1-bca0-4907-a036-c80e7685e1e9) |
 
-| K = 50 | K = 55 |
-|---|---|
-| ![K=50](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/13530016-d2aa-4441-9b66-c636d3cd5400) | ![K=55](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/3bd716c3-7983-4c31-9d4f-7eec11201e67) |
-   K = 40
-   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/983bd831-f581-4089-a531-2eeb6de27725)
-
-   K = 45
-   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/9f0190c1-bca0-4907-a036-c80e7685e1e9)
-
-   K = 50
-   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/13530016-d2aa-4441-9b66-c636d3cd5400)
-
-   K = 55
-   ![image](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/3bd716c3-7983-4c31-9d4f-7eec11201e67)
-
-
+   | K = 50 | K = 55 |
+   |---|---|
+   | ![K=50](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/13530016-d2aa-4441-9b66-c636d3cd5400) | ![K=55](https://github.com/CS-6240-2023-Summer-1/project-spark-kmeans-clustering/assets/50697493/3bd716c3-7983-4c31-9d4f-7eec11201e67) |
+   
 
 
 
