@@ -24,6 +24,7 @@ object Aliases {
 }
 import Aliases._
 
+// Define the Posting case class to represent a Stack Overflow posting
 case class Posting(
                     postingType: Int,
                     id: Int,
@@ -33,6 +34,7 @@ case class Posting(
                     tags: Option[String]
                   ) extends Serializable
 
+// Define the StackOverflowInterface trait with methods and properties for Stack Overflow functionality
 trait StackOverflowInterface {
   def calculateClusterResults(means: Array[(Int, Int)], vectors: RDD[(LangIndex, HighScore)]): Array[(String, Double, Int, Int)]
   def groupPostings(postings: RDD[Posting]): RDD[(QID, Iterable[(Question, Answer)])]
@@ -45,34 +47,49 @@ trait StackOverflowInterface {
   val languages: List[String]
 }
 
+// Implement the StackOverflow class that extends the StackOverflowInterface
 object StackOverflow extends StackOverflow {
 
+  // Set logger level to ERROR
   Logger.getLogger("org.apache.spark").setLevel(Level.ERROR)
 
+  // Create Spark configuration and Spark context
   @transient lazy val sparkConf: SparkConf =
     new SparkConf().setMaster("local[2]").setAppName("StackOverflow")
   @transient lazy val sparkContext: SparkContext = new SparkContext(sparkConf)
 
+
   def main(args: Array[String]): Unit = {
     val inputFileLocation: String = "stackoverflow.csv"
 
+    // Read lines from the input file as a stream
     val lines = readLinesAsStream(sparkContext, inputFileLocation)
+    // Extract raw postings from the lines
     val rawPostings = extractRawPostings(lines)
+    // Group postings by a common identifier (QID)
     val groupedPostings = groupPostings(rawPostings)
+    // Score the postings based on their attributes
     val scoredPostings = scorePostings(groupedPostings)
+    // Vectorize the scored postings
     val vectorizedPostings = vectorizePostings(scoredPostings)
+    // Assert the count of vectorized postings
     assert(
       vectorizedPostings.count() == 1042132,
       "Incorrect number of vectors: " + vectorizedPostings.count()
     )
 
+    // Run K-means clustering on the vectorized postings
     val means = runKMeans(sampleVectors(vectorizedPostings, kMeansKernels * languages.length), vectorizedPostings, debug = true)
+    // Calculate cluster results based on the means and vectorized postings
     val results = calculateClusterResults(means, vectorizedPostings)
+    // Print the results of the clustering
     printResults(results)
 
-    val kValues = Array(10, 20, 30, 35, 40, 45, 50, 55) // Specify the desired values of k here
+    val kValues = Array(25, 30, 35, 40, 45, 50, 55) // Specify the desired values of k here
 
+    // Iterate over the specified k values
     kValues.foreach { k =>
+      // Run K-means clustering with the current k
       val means = runKMeans(sampleVectors(vectorizedPostings, k * languages.length), vectorizedPostings, k, debug = true)
       val sse = calculateSSE(means, vectorizedPostings)
       val results = calculateClusterResults(means, vectorizedPostings)
@@ -81,6 +98,7 @@ object StackOverflow extends StackOverflow {
       printResults(results)
     }
 
+    // Calculate SSE values for each k
     val sseValues = kValues.map { k =>
       val means = runKMeans(sampleVectors(vectorizedPostings, k * languages.length), vectorizedPostings)
       val sse = calculateSSE(means, vectorizedPostings)
@@ -99,6 +117,7 @@ object StackOverflow extends StackOverflow {
 
   }
 
+  // Calculate the sum of squared error (SSE) for a set of means and vectors
   def calculateSSE(means: Array[(Int, Int)], vectors: RDD[(Int, Int)]): Double = {
     vectors
       .map(v => (findClosest(v, means), v))
@@ -108,6 +127,7 @@ object StackOverflow extends StackOverflow {
       .sum()
   }
 
+  // Find the optimal k based on SSE values using the elbow method
   def findOptimalK(sseValues: Array[(Int, Double)]): Int = {
     val sseDifferences = sseValues.sliding(2).map { case Array(a, b) =>
       val (_, sseA) = a
@@ -161,11 +181,13 @@ class StackOverflow extends StackOverflowInterface with Serializable {
   def kMeansEta: Double = 20.0d
   def kMeansMaxIterations: Int = 120
 
+  //Reads the lines from an input file location into an RDD of strings.
   def readLinesAsStream(sparkContext: SparkContext, inputFileLocation: String): RDD[String] = {
     val fileData = Source.fromResource(inputFileLocation)(Codec.UTF8)
     sparkContext.parallelize(fileData.getLines().toList)
   }
 
+  //Extracts the raw postings from RDD[String] and maps them to Posting objects.
   def extractRawPostings(lines: RDD[String]): RDD[Posting] =
     lines.map(line => {
       val arr = line.split(",")
@@ -179,12 +201,14 @@ class StackOverflow extends StackOverflowInterface with Serializable {
       )
     })
 
+  // Groups the postings by question ID and returns RDD[(QID, Iterable[(Question, Answer)])].
   def groupPostings(postings: RDD[Posting]): RDD[(QID, Iterable[(Question, Answer)])] = {
     val questions = postings.filter(_.postingType == 1).map(post => (post.id, post))
     val answers = postings.filter(_.postingType == 2).map(post => (post.parentId.get, post))
     (questions join answers).groupByKey
   }
 
+  //Computes the high score for each question-answer pair and returns RDD[(Question, HighScore)].
   def scorePostings(grouped: RDD[(QID, Iterable[(Question, Answer)])]): RDD[(Question, HighScore)] = {
     def answerHighScore(answers: Array[Answer]): HighScore = {
       var highScore = 0
@@ -202,6 +226,7 @@ class StackOverflow extends StackOverflowInterface with Serializable {
       .values
   }
 
+  //Maps the scored postings to a vector representation (LangIndex, HighScore).
   def vectorizePostings(scored: RDD[(Question, HighScore)]): RDD[(LangIndex, HighScore)] = {
     def firstLangInTag(tag: Option[String], languages: List[String]): Option[Int] =
       tag match {
@@ -222,6 +247,7 @@ class StackOverflow extends StackOverflowInterface with Serializable {
       .persist
   }
 
+  // Samples vectors for clustering based on a given number k and language distribution.
   def sampleVectors(vectors: RDD[(LangIndex, HighScore)], k: Int): Array[(Int, Int)] = {
     assert(
       k % languages.length == 0,
@@ -253,6 +279,9 @@ class StackOverflow extends StackOverflowInterface with Serializable {
   }
 
 
+  // Performs the K-means clustering algorithm using an iterative approach.
+  // It takes an initial set of means, vectors, and optional parameters like iterations and debug mode.
+  // It returns the updated means after convergence.
   @tailrec
   final def runKMeans(
                        means: Array[(Int, Int)],
@@ -292,14 +321,17 @@ class StackOverflow extends StackOverflowInterface with Serializable {
     }
   }
 
+  //Checks if the distance between means is below the convergence threshold.
   def converged(distance: Double): Boolean =
     distance < kMeansEta
 
+  //Calculates the Euclidean distance between two vectors or arrays of vectors.
   def calculateEuclideanDistance(v1: (Int, Int), v2: (Int, Int)): Double = {
     val part1 = (v1._1 - v2._1).toDouble * (v1._1 - v2._1)
     val part2 = (v1._2 - v2._2).toDouble * (v1._2 - v2._2)
     part1 + part2
   }
+
 
   def calculateEuclideanDistance(a1: Array[(Int, Int)], a2: Array[(Int, Int)]): Double = {
     assert(a1.length == a2.length)
@@ -312,6 +344,7 @@ class StackOverflow extends StackOverflowInterface with Serializable {
     sum
   }
 
+  //Finds the closest mean to a given vector.
   def findClosest(point: (Int, Int), centers: Array[(Int, Int)]): (Int, Int) = {
     var bestCenter: (Int, Int) = null
     var closest = Double.PositiveInfinity
@@ -325,6 +358,7 @@ class StackOverflow extends StackOverflowInterface with Serializable {
     bestCenter
   }
 
+  //Calculates the average vector for a set of points.
   def averageVectors(points: Iterable[(Int, Int)]): (Int, Int) = {
     val iterator = points.iterator
     var count = 0
@@ -339,6 +373,8 @@ class StackOverflow extends StackOverflowInterface with Serializable {
     ((comp1 / count).toInt, (comp2 / count).toInt)
   }
 
+  //Calculates cluster information such as the most common language, percentage, cluster size, and
+  // median score for each cluster.
   def calculateClusterResults(
                                means: Array[(Int, Int)],
                                vectors: RDD[(LangIndex, HighScore)]
@@ -367,6 +403,7 @@ class StackOverflow extends StackOverflowInterface with Serializable {
     median.collect().map(_._2).sortBy(_._4)(Ordering.Int.reverse)
   }
 
+  // Prints the cluster information in a formatted manner.
   def printResults(results: Array[(String, Double, Int, Int)]): Unit = {
     println("CLUSTER INFORMATION:")
     println("  Score  Language Questions")
